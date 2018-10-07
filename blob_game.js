@@ -66,25 +66,25 @@ maxSkeletons = 50,
 finalTime = 0;
 
 function preload() {
-    this.load.spritesheet('blob_death', '/assets/images/blob_death_grayscale.png', { frameWidth: 80, frameHeight: 80 });
-    this.load.spritesheet('blob_child', '/assets/images/blob_child_grayscale.png', { frameWidth: 26, frameHeight: 32 });
-    this.load.spritesheet('blob', '/assets/images/blob_up_down_yellow.png', { frameWidth: 34, frameHeight: 34 });
-    this.load.spritesheet('blob_left', '/assets/images/blob_walk_left_yellow.png', { frameWidth: 34, frameHeight: 34 });
-    this.load.spritesheet('blob_right', '/assets/images/blob_walk_right_yellow.png', { frameWidth: 34, frameHeight: 34 });
-    this.load.spritesheet('gem', '/assets/images/gem.png', { frameWidth: 20, frameHeight: 30 });
-    this.load.spritesheet('skeleton', '/assets/images/skeleton_sprite_sheet.png', { frameWidth: 32, frameHeight: 48 });
-    this.load.spritesheet('skeleton_rise', '/assets/images/skeleton_rise.png', { frameWidth: 32, frameHeight: 48 });
-    this.load.image('tiles', '/assets/images/tileset.png');
-    this.load.tilemapTiledJSON('map', '/assets/images/blobmap.json');
-    this.load.audio('victory', '/assets/audio/victory.wav');
-    this.load.audio('death', '/assets/audio/death.wav');
-    this.load.audio('pop', '/assets/audio/pop.wav');
-    this.load.audio('gem_on', '/assets/audio/gem_on.wav');
-    this.load.audio('gem_off', '/assets/audio/gem_off.wav');
-    this.load.audio('teleport', '/assets/audio/teleport.wav');
-    this.load.audio('rise', '/assets/audio/rise.wav');
-    this.load.audio('skeleton_death', '/assets/audio/skeleton_death.wav');
-    this.load.audio('game_track', '/assets/audio/game_track.mp3');
+    this.load.spritesheet('blob_death', 'public/images/blob_death_grayscale.png', { frameWidth: 80, frameHeight: 80 });
+    this.load.spritesheet('blob_child', 'public/images/blob_child_grayscale.png', { frameWidth: 26, frameHeight: 32 });
+    this.load.spritesheet('blob', 'public/images/blob_up_down_yellow.png', { frameWidth: 34, frameHeight: 34 });
+    this.load.spritesheet('blob_left', 'public/images/blob_walk_left_yellow.png', { frameWidth: 34, frameHeight: 34 });
+    this.load.spritesheet('blob_right', 'public/images/blob_walk_right_yellow.png', { frameWidth: 34, frameHeight: 34 });
+    this.load.spritesheet('gem', 'public/images/gem.png', { frameWidth: 20, frameHeight: 30 });
+    this.load.spritesheet('skeleton', 'public/images/skeleton_sprite_sheet.png', { frameWidth: 32, frameHeight: 48 });
+    this.load.spritesheet('skeleton_rise', 'public/images/skeleton_rise.png', { frameWidth: 32, frameHeight: 48 });
+    this.load.image('tiles', 'public/images/tileset.png');
+    this.load.tilemapTiledJSON('map', 'public/images/blobmap.json');
+    this.load.audio('victory', 'public/audio/victory.wav');
+    this.load.audio('death', 'public/audio/death.wav');
+    this.load.audio('pop', 'public/audio/pop.wav');
+    this.load.audio('gem_on', 'public/audio/gem_on.wav');
+    this.load.audio('gem_off', 'public/audio/gem_off.wav');
+    this.load.audio('teleport', 'public/audio/teleport.wav');
+    this.load.audio('rise', 'public/audio/rise.wav');
+    this.load.audio('skeleton_death', 'public/audio/skeleton_death.wav');
+    this.load.audio('game_track', 'public/audio/game_track.mp3');
 }
 
 function create() {
