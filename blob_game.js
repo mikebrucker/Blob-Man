@@ -29,6 +29,7 @@ let music_config = {
     loop: true,
     delay: 0
 },
+victory,
 getExtraLife,
 gameOver,
 invincible,
@@ -71,7 +72,13 @@ function collectBlobs(player, blob) {
     blob.anims.play('collect', true);
     blob.on('animationcomplete', function() {
         blob.disableBody(true, false);
-    });
+        if (blobs.countActive(true) === 0) {
+            if (victory) {
+                this.sound.play('victory');
+                victory = false;
+            }
+        }
+    }, this);
 }
 
 function contactSkeletons(player, skeleton) {
@@ -334,8 +341,9 @@ class SceneGame extends Phaser.Scene {
     }
     
     create() {
-        gameOver = false,
-        invincible = false,
+        gameOver = false;
+        invincible = false;
+        victory = true;
 
         music.play();
 
@@ -349,9 +357,16 @@ class SceneGame extends Phaser.Scene {
         worldLayer.setCollisionBetween(409, 512, true, 'World');
 
         lifeIcons = this.add.group();
-
-        lifeIcons.create(320, 40, 'life');
-        lifeIcons.create(320, 60, 'life');
+        
+        if (lives > 1) {
+            lifeIcons.create(320, 40, 'life');
+        }
+        if (lives > 2) {
+            lifeIcons.create(320, 60, 'life');
+        }
+        if (lives > 3) {
+            lifeIcons.create(320, 80, 'life');
+        }
         
         blobs = this.physics.add.group();
         gems = this.physics.add.group();
@@ -477,7 +492,6 @@ class SceneGame extends Phaser.Scene {
         }
 
         if (blobs.countActive(true) === 0) {
-            this.sound.play('victory');
             console.log(finalTime);
             this.add.text(320, 240, 'You Collected All Blobs In', {fontSize: '40px', fill: '#00FF2D', fontFamily: 'Arial', stroke: '#000000', strokeThickness: 6}).setOrigin(0.5);
             this.add.text(320, 320, `${finalTime} Seconds`, {fontSize: '88px', fill: '#00FF2D', fontFamily: 'Arial', stroke: '#000000', strokeThickness: 8}).setOrigin(0.5);
