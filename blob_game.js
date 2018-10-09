@@ -116,12 +116,12 @@ function contactSkeletons(player, skeleton) {
             let graphics = this.add.graphics();
             graphics.fillStyle(0x222222);
             graphics.lineStyle(4, 0x00FF2D);
-            graphics.fillRoundedRect(230, 440, 180, 80, 32);
-            graphics.strokeRoundedRect(230, 440, 180, 80, 32);
+            graphics.fillRoundedRect(200, 440, 240, 80, 32);
+            graphics.strokeRoundedRect(200, 440, 240, 80, 32);
 
             this.add.text(320, 240, 'You Lost In', {fontSize: '40px', fill: '#00FF2D', fontFamily: 'Arial', stroke: '#000000', strokeThickness: 6}).setOrigin(0.5);
             this.add.text(320, 320, `${finalTime} Seconds`, {fontSize: '88px', fill: '#00FF2D', fontFamily: 'Arial', stroke: '#000000', strokeThickness: 8}).setOrigin(0.5);
-            this.add.text(320, 480, 'Restart', { fontSize: '40px', padding: 10, fill: '#00FF2D', fontFamily: 'Arial', stroke: '#000000', strokeThickness: 6 })
+            this.add.text(320, 480, 'Game Over', { fontSize: '40px', padding: 10, fill: '#00FF2D', fontFamily: 'Arial', stroke: '#000000', strokeThickness: 6 })
             .setOrigin(0.5)
             .setInteractive()
             .on('pointerup', function() {
@@ -371,10 +371,10 @@ class SceneGame extends Phaser.Scene {
             lifeIcons.create(320, 40, 'life');
         }
         if (lives > 2) {
-            lifeIcons.create(320, 60, 'life');
+            lifeIcons.create(320, 64, 'life');
         }
         if (lives > 3) {
-            lifeIcons.create(320, 80, 'life');
+            lifeIcons.create(320, 88, 'life');
         }
         
         blobs = this.physics.add.group();
@@ -456,7 +456,8 @@ class SceneGame extends Phaser.Scene {
             }
         }
 
-        pointsText = this.add.text(160, 16, '0', {fontSize: '24px', fill: '#00FF2D', fontFamily: 'Arial', stroke: '#000000', strokeThickness: 4}).setOrigin(0.5);
+        pointsText = this.add.text(160, 16, points, {fontSize: '24px', fill: '#00FF2D', fontFamily: 'Arial', stroke: '#000000', strokeThickness: 4}).setOrigin(0.5);
+        this.add.text(480, 16, `Level ${level}`, {fontSize: '24px', fill: '#00FF2D', fontFamily: 'Arial', stroke: '#000000', strokeThickness: 4}).setOrigin(0.5);
         timer = this.add.text(320, 16, '0:00', {fontSize: '24px', fill: '#00FF2D', fontFamily: 'Arial', stroke: '#000000', strokeThickness: 4}).setOrigin(0.5);
         let timer_sec = 1,
         timer_min = 0;
@@ -489,9 +490,9 @@ class SceneGame extends Phaser.Scene {
         if (getExtraLife) {
             if (points > 9999) {
                 if (lifeIcons.getLength() === 2) {
-                    lifeIcons.create(320, 80, 'life');
+                    lifeIcons.create(320, 88, 'life');
                 } else if (lifeIcons.getLength() === 1) {
-                    lifeIcons.create(320, 60, 'life');
+                    lifeIcons.create(320, 64, 'life');
                 } else {
                     lifeIcons.create(320, 40, 'life');
                 }

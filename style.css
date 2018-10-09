@@ -1,9 +1,5 @@
-html {
-    background: rgb(51, 51, 51);
-    background: linear-gradient(to left, black, yellow, #00FF2D, #00FF2D, #00FF2D, #00FF2D, #00FF2D, yellow, black);
-}
-
 body {
+    background: linear-gradient(to left, white, yellow, #00FF2D, #00FF2D, #00FF2D, #00FF2D, #00FF2D, yellow, white);
     margin: 0 auto;
     text-align: center;
     font-family: 'Courier New', Courier, monospace;
@@ -24,4 +20,3 @@ body {
 .block {
     display: block;
 }
-
