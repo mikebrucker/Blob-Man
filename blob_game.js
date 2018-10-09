@@ -29,8 +29,12 @@ let music_config = {
     loop: true,
     delay: 0
 },
-highScores = [],
-gameNumber = 1,
+playMusic = true,
+playSFX = true,
+musicButtonGreen,
+musicButtonRed,
+sfxButtonGreen,
+sfxButtonRed,
 victoryMusic,
 gameOverMusic,
 getExtraLife,
@@ -49,6 +53,8 @@ createSkeletons,
 gameTimer,
 lifeIcons,
 pointsText,
+highScores = [],
+gameNumber = 1,
 points = 0,
 maxSkeletons = 4,
 level = 1,
@@ -56,6 +62,28 @@ lives = 3,
 riseTime = 4000,
 skeletonSpeed = 60,
 finalTime = 0;
+
+function makeMusicButton() {
+    if (playMusic) {
+        musicButton = this.add.image(592, 12, 'music_on').setInteractive()
+        .on('pointerup', function() {
+            music.setMute(playMusic);
+            playMusic = !playMusic;
+            musicButton.destroy()
+        }, this);
+    } else {
+        musicButton = this.add.image(592, 12, 'music_off').setInteractive()
+        .on('pointerup', function() {
+            music.setMute(playMusic);
+            playMusic = !playMusic;
+            musicButton.destroy()
+        }, this);
+    }
+}
+
+function makeSFXButton() {
+
+}
 
 function componentToHex(c) {
     let hex = c.toString(16);
@@ -70,13 +98,15 @@ function collectBlobs(player, blob) {
     blob.on('animationstart', function() {
         points += 10;
         pointsText.setText(points);
-        this.sound.play('pop');
+        if (playSFX) {
+            this.sound.play('pop');
+        }
     }, this);
     blob.anims.play('collect', true);
     blob.on('animationcomplete', function() {
         blob.disableBody(true, false);
         if (blobs.countActive(true) === 0) {
-            if (victoryMusic) {
+            if (victoryMusic && playSFX) {
                 this.sound.play('victory');
                 victoryMusic = false;
             }
@@ -85,7 +115,9 @@ function collectBlobs(player, blob) {
 }
 
 function contactSkeletons(player, skeleton) {
-    this.sound.play('skeleton_death')
+    if (playSFX) {
+        this.sound.play('skeleton_death')
+    }
     if (invincible) {
         points += 200;
         pointsText.setText(points);    
@@ -108,7 +140,7 @@ function contactSkeletons(player, skeleton) {
                     blob.anims.play('collect');
                 }
             }
-            if (gameOverMusic) {
+            if (gameOverMusic && playSFX) {
                 this.sound.play('death')
                 gameOverMusic = false;
             }
@@ -140,13 +172,15 @@ function contactSkeletons(player, skeleton) {
 function collectGems(player, gem) {
     points += 50;
     pointsText.setText(points);
-    this.sound.play('gem_on')
+    if (playSFX) {
+        this.sound.play('gem_on');
+    }
     invincible = true;
     gem.disableBody(true, true);
     player.setTint(0xFF00FF);
     clearTimeout(invincibleTimer);
     invincibleTimer = setTimeout( () => {
-        if (!gameOver) {
+        if (!gameOver && playSFX) {
             this.sound.play('gem_off');
         }
         player.clearTint();
@@ -238,6 +272,10 @@ class BootGame extends Phaser.Scene {
         this.load.image('tiles', 'public/images/tileset.png');
         this.load.image('background', 'public/images/blobmap.png');
         this.load.image('life', 'public/images/life.png');
+        this.load.image('music_on', 'public/images/music_on.png');
+        this.load.image('music_off', 'public/images/music_off.png');
+        this.load.image('sfx_on', 'public/images/sfx_on.png');
+        this.load.image('sfx_off', 'public/images/sfx_off.png');
         this.load.tilemapTiledJSON('map', 'public/images/blobmap.json');
         this.load.audio('victory', 'public/audio/victory.wav');
         this.load.audio('death', 'public/audio/death.wav');
@@ -365,6 +403,44 @@ class SceneGame extends Phaser.Scene {
         worldLayer.setCollisionBetween(272, 407, true, 'World');
         worldLayer.setCollisionBetween(409, 512, true, 'World');
 
+        musicButtonGreen = this.add.image(592, 12, 'music_on').setInteractive()
+        .on('pointerup', function() {
+            music.setMute(playMusic);
+            musicButtonRed.setAlpha(1);
+            playMusic = !playMusic;
+        }, this);
+        musicButtonRed = this.add.image(592, 12, 'music_off').setInteractive()
+        .on('pointerup', function() {
+            music.setMute(playMusic);
+            musicButtonRed.setAlpha(0);
+            playMusic = !playMusic;
+        }, this);
+        sfxButtonGreen = this.add.image(624, 12, 'sfx_on').setInteractive()
+        .on('pointerup', function() {
+            if (playSFX) {
+                this.sound.pauseAll();
+                music.resume();
+            }
+            sfxButtonRed.setAlpha(1);
+            playSFX = !playSFX;
+        }, this);
+        sfxButtonRed = this.add.image(624, 12, 'sfx_off').setInteractive()
+        .on('pointerup', function() {
+            if (playSFX) {
+                this.sound.pauseAll();
+                music.resume();
+            }
+            sfxButtonRed.setAlpha(0);
+            playSFX = !playSFX;
+        }, this);
+
+        if (playSFX) {
+            sfxButtonRed.setAlpha(0);
+        }
+        if (playMusic) {
+            musicButtonRed.setAlpha(0);
+        }
+
         lifeIcons = this.add.group();
         
         if (lives > 1) {
@@ -405,7 +481,9 @@ class SceneGame extends Phaser.Scene {
                 rise.displayHeight = 32;
                 rise.displayWidth = 21.333333;
                 rise.anims.play('skeleton_rise');
-                rise_sound.play();
+                if (playSFX) {
+                    rise_sound.play();
+                }
                 rise.on('animationcomplete', function() {
                     rise.disableBody(true, true);
                     let skeleton = skeletons.create(320, 352, 'skeleton');
@@ -558,10 +636,14 @@ class SceneGame extends Phaser.Scene {
         }
 
         if (player.x < 0) {
-            this.sound.play('teleport');
+            if (playSFX) {
+                this.sound.play('teleport');
+            }
             player.setX(639).setY(336);
         } else if (player.x > 639) {
-            this.sound.play('teleport');
+            if (playSFX) {
+                this.sound.play('teleport');
+            }
             player.setX(0).setY(336);
         }
 
@@ -727,8 +809,41 @@ class SceneStartScreen extends Phaser.Scene {
         getExtraLife = true;
         gameOverMusic = true;
         this.add.image(320, 320, 'background');
+
+        musicButtonGreen = this.add.image(592, 12, 'music_on').setInteractive()
+        .on('pointerup', function() {
+            music.setMute(playMusic);
+            musicButtonRed.setAlpha(1);
+            playMusic = !playMusic;
+        }, this);
+        musicButtonRed = this.add.image(592, 12, 'music_off').setInteractive()
+        .on('pointerup', function() {
+            music.setMute(playMusic);
+            musicButtonRed.setAlpha(0);
+            playMusic = !playMusic;
+        }, this).setAlpha(0);
+        sfxButtonGreen = this.add.image(624, 12, 'sfx_on').setInteractive()
+        .on('pointerup', function() {
+            if (playSFX) {
+                this.sound.pauseAll();
+                music.resume();
+            }
+            sfxButtonRed.setAlpha(1);
+            playSFX = !playSFX;
+        }, this);
+        sfxButtonRed = this.add.image(624, 12, 'sfx_off').setInteractive()
+        .on('pointerup', function() {
+            if (playSFX) {
+                this.sound.pauseAll();
+                music.resume();
+            }
+            sfxButtonRed.setAlpha(0);
+            playSFX = !playSFX;
+        }, this).setAlpha(0);
+
         this.add.sprite(176, 336, 'blob_child_color').play('idle_color').setScale(0.75);
         this.add.sprite(464, 336, 'blob_child_color').play('idle_color').setScale(0.75);
+
         let graphics = this.add.graphics();
         graphics.fillStyle(0x222222);
         graphics.lineStyle(4, 0x00FF2D);
@@ -736,6 +851,7 @@ class SceneStartScreen extends Phaser.Scene {
         graphics.strokeRoundedRect(240, 440, 160, 80, 32);
         graphics.fillRoundedRect(10, 88, 620, 136, 32);
         graphics.strokeRoundedRect(10, 88, 620, 136, 32);
+
         this.add.text(320, 160, 'Blob Man', { fontSize: '140px', padding: 10, fill: '#00FF2D', fontFamily: 'Arial', stroke: '#000000', strokeThickness: 10 }).setOrigin(0.5);
         this.add.text(320, 480, 'Start', { fontSize: '40px', padding: 10, fill: '#00FF2D', fontFamily: 'Arial', stroke: '#000000', strokeThickness: 6 })
         .setOrigin(0.5)
