@@ -29,7 +29,9 @@ let music_config = {
     loop: true,
     delay: 0
 },
-victory,
+highScores = [],
+gameNumber = 1,
+victoryMusic,
 getExtraLife,
 gameOver,
 invincible,
@@ -73,9 +75,9 @@ function collectBlobs(player, blob) {
     blob.on('animationcomplete', function() {
         blob.disableBody(true, false);
         if (blobs.countActive(true) === 0) {
-            if (victory) {
+            if (victoryMusic) {
                 this.sound.play('victory');
-                victory = false;
+                victoryMusic = false;
             }
         }
     }, this);
@@ -105,19 +107,24 @@ function contactSkeletons(player, skeleton) {
                     blob.anims.play('collect');
                 }
             }
+
             this.sound.play('death')
             
-            this.add.text(320, 240, 'You Lost In', {fontSize: '40px', fill: '#00FF2D', fontFamily: 'Arial', stroke: '#000000', strokeThickness: 6}).setOrigin(0.5);
-            this.add.text(320, 320, `${finalTime} Seconds`, {fontSize: '88px', fill: '#00FF2D', fontFamily: 'Arial', stroke: '#000000', strokeThickness: 8}).setOrigin(0.5);
             let graphics = this.add.graphics();
             graphics.fillStyle(0x222222);
             graphics.lineStyle(4, 0x00FF2D);
             graphics.fillRoundedRect(230, 440, 180, 80, 32);
             graphics.strokeRoundedRect(230, 440, 180, 80, 32);
+
+            this.add.text(320, 240, 'You Lost In', {fontSize: '40px', fill: '#00FF2D', fontFamily: 'Arial', stroke: '#000000', strokeThickness: 6}).setOrigin(0.5);
+            this.add.text(320, 320, `${finalTime} Seconds`, {fontSize: '88px', fill: '#00FF2D', fontFamily: 'Arial', stroke: '#000000', strokeThickness: 8}).setOrigin(0.5);
             this.add.text(320, 480, 'Restart', { fontSize: '40px', padding: 10, fill: '#00FF2D', fontFamily: 'Arial', stroke: '#000000', strokeThickness: 6 })
             .setOrigin(0.5)
             .setInteractive()
             .on('pointerup', function() {
+                highScores.push(points);
+                document.getElementById('highScores').innerHTML += `<div class='highScore'>Game ${gameNumber}: ${points} </div><div class='block'></div>`;
+                gameNumber++;
                 this.sound.stopAll();
                 this.scene.start('sceneStartScreen');
             }, this);
@@ -191,6 +198,7 @@ function findTiles(skeleton) {
 }
 
 class BootGame extends Phaser.Scene {
+
     constructor() {
         super({ key: 'bootGame', active: true })
     }
@@ -333,17 +341,15 @@ class BootGame extends Phaser.Scene {
 }
 
 class SceneGame extends Phaser.Scene {
+
     constructor() {
         super('sceneGame');
-    }
-
-    preload() {
     }
     
     create() {
         gameOver = false;
         invincible = false;
-        victory = true;
+        victoryMusic = true;
 
         music.play();
 
@@ -707,15 +713,13 @@ class SceneStartScreen extends Phaser.Scene {
         super('sceneStartScreen');
     }
 
-    preload() {
-    }
-
     create() {
-        points = 0;
-        maxSkeletons = 4;
-        skeletonSpeed = 60;
-        level = 1;
-        riseTime = 4000;
+        points = 0,
+        maxSkeletons = 4,
+        level = 1,
+        lives = 3,
+        riseTime = 4000,
+        skeletonSpeed = 60,
         getExtraLife = true;
         this.add.image(320, 320, 'background');
         this.add.sprite(176, 336, 'blob_child_color').play('idle_color').setScale(0.75);
@@ -743,7 +747,7 @@ let config = {
     parent: 'content',
     width: 640,
     height: 640,
-    parent: 'gamecontainer',
+    parent: 'gameContainer',
     physics: {
         default: 'arcade',
         arcade: {
