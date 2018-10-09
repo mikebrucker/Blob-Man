@@ -63,28 +63,6 @@ riseTime = 4000,
 skeletonSpeed = 60,
 finalTime = 0;
 
-function makeMusicButton() {
-    if (playMusic) {
-        musicButton = this.add.image(592, 12, 'music_on').setInteractive()
-        .on('pointerup', function() {
-            music.setMute(playMusic);
-            playMusic = !playMusic;
-            musicButton.destroy()
-        }, this);
-    } else {
-        musicButton = this.add.image(592, 12, 'music_off').setInteractive()
-        .on('pointerup', function() {
-            music.setMute(playMusic);
-            playMusic = !playMusic;
-            musicButton.destroy()
-        }, this);
-    }
-}
-
-function makeSFXButton() {
-
-}
-
 function componentToHex(c) {
     let hex = c.toString(16);
     return hex.length == 1 ? "0" + hex : hex;
@@ -116,8 +94,9 @@ function collectBlobs(player, blob) {
 
 function contactSkeletons(player, skeleton) {
     if (playSFX) {
-        this.sound.play('skeleton_death')
+        this.sound.play('skeleton_death');
     }
+
     if (invincible) {
         points += 200;
         pointsText.setText(points);    
@@ -140,8 +119,9 @@ function contactSkeletons(player, skeleton) {
                     blob.anims.play('collect');
                 }
             }
+
             if (gameOverMusic && playSFX) {
-                this.sound.play('death')
+                this.sound.play('death');
                 gameOverMusic = false;
             }
             
@@ -163,6 +143,7 @@ function contactSkeletons(player, skeleton) {
                 this.sound.stopAll();
                 this.scene.start('sceneStartScreen');
             }, this);
+
             gameOver = true;
         }
     }
@@ -194,14 +175,14 @@ function turnLeft(sprite) {
     let j = Math.floor(sprite.y/32);
     if (maze[j][i - 1] != 0) {
         player.y = (j * 32) + 16;
-    };
+    }
 }
 function turnRight(sprite) {
     let i = Math.floor(sprite.x/32);
     let j = Math.floor(sprite.y/32);
     if (maze[j][i + 1] != 0) {
         player.y = (j * 32) + 16;
-    };
+    }
 }
 function turnUp(sprite) {
     let i = Math.floor(sprite.x/32);
@@ -215,7 +196,7 @@ function turnDown(sprite) {
     let j = Math.floor(sprite.y/32);
     if (maze[j + 1][i] != 0) {
         player.x = (i * 32) + 16;
-    };
+    }
 }
 
 // Finds the tile underneath and the tiles around the skeleton as well as getting the alignment coordinates
@@ -231,20 +212,21 @@ function findTiles(skeleton) {
         ((i * 32) + 16), // [4] Align X
         ((j * 32) + 16), // [5] Align Y
         maze[j][i],     // [6] Current Tile
-        i * j]           // [7] Unique Tile Id
+        i * j           // [7] Unique Tile Id
+    ];
 }
 
 class BootGame extends Phaser.Scene {
 
     constructor() {
-        super({ key: 'bootGame', active: true })
+        super({ key: 'bootGame', active: true });
     }
 
     preload() {
-        let progressBox = this.add.graphics(),
-        progressBar = this.add.graphics(),
-        loadText = this.add.text(320, 320, 'Loading... 0%', { fontSize: '24px', fill: 'gold', fontFamily: 'Arial', stroke: 'black', strokeThickness: 8 }).setOrigin(0.5),
-        assetText = this.add.text(320, 400, 'Loading Asset:', { fontSize: '24px', fill: 'gold', fontFamily: 'Arial', stroke: 'black', strokeThickness: 8 }).setOrigin(0.5);
+        let loadText = this.add.text(320, 320, 'Loading... 0%', { fontSize: '24px', fill: 'gold', fontFamily: 'Arial', stroke: 'black', strokeThickness: 8 }).setOrigin(0.5),
+        assetText = this.add.text(320, 400, 'Loading Asset:', { fontSize: '24px', fill: 'gold', fontFamily: 'Arial', stroke: 'black', strokeThickness: 8 }).setOrigin(0.5),
+        progressBox = this.add.graphics(),
+        progressBar = this.add.graphics();
         progressBox.fillStyle(0x444444, 0.8);
         progressBox.fillRect(20, 290, 600, 60);
         
@@ -252,10 +234,10 @@ class BootGame extends Phaser.Scene {
             progressBar.clear();
             progressBar.fillStyle(0x00FF2D, 1);
             progressBar.fillRect(30, 300, 580 * value, 40);
-            loadText.setText(`Loading... ${Math.ceil(value * 100)}%`)
+            loadText.setText(`Loading... ${Math.ceil(value * 100)}%`);
         }, this);
         
-        this.load.on('fileprogress', function (file) {
+        this.load.on('fileprogress', function(file) {
             assetText.setText(`Loading Asset: ${file.key}`);
         });
         
@@ -476,7 +458,7 @@ class SceneGame extends Phaser.Scene {
             if (skeletons.countActive(true) < maxSkeletons) {
                 let rise = rises.create(320, 352, 'skeleton_rise');
                 if (invincible) {
-                    rise.setTint(0x00DDFF)
+                    rise.setTint(0x00DDFF);
                 }
                 rise.displayHeight = 32;
                 rise.displayWidth = 21.333333;
@@ -493,9 +475,10 @@ class SceneGame extends Phaser.Scene {
             }
         }, riseTime);
         
-        let whatLevel = this.add.text(320, 320, `Level ${level}`, {fontSize: '88px', fill: '#00FF2D', fontFamily: 'Arial', stroke: '#000000', strokeThickness: 8}).setOrigin(0.5);
-        let duration;
-        (riseTime < 2000) ? duration = 2000 : duration = riseTime;
+        let whatLevel = this.add.text(320, 320, `Level ${level}`, {fontSize: '88px', fill: '#00FF2D', fontFamily: 'Arial', stroke: '#000000', strokeThickness: 8}).setOrigin(0.5),
+        duration;
+
+        riseTime < 2000 ? duration = 2000 : duration = riseTime;
         this.add.tween({
             targets: whatLevel,
             ease: 'Sine.easeInOut',
@@ -534,9 +517,10 @@ class SceneGame extends Phaser.Scene {
             }
         }
 
-        pointsText = this.add.text(160, 16, points, {fontSize: '24px', fill: '#00FF2D', fontFamily: 'Arial', stroke: '#000000', strokeThickness: 4}).setOrigin(0.5);
         this.add.text(480, 16, `Level ${level}`, {fontSize: '24px', fill: '#00FF2D', fontFamily: 'Arial', stroke: '#000000', strokeThickness: 4}).setOrigin(0.5);
+        pointsText = this.add.text(160, 16, points, {fontSize: '24px', fill: '#00FF2D', fontFamily: 'Arial', stroke: '#000000', strokeThickness: 4}).setOrigin(0.5);
         timer = this.add.text(320, 16, '0:00', {fontSize: '24px', fill: '#00FF2D', fontFamily: 'Arial', stroke: '#000000', strokeThickness: 4}).setOrigin(0.5);
+
         let timer_sec = 1,
         timer_min = 0;
         gameTimer = setInterval(function gameTimer() {
@@ -589,6 +573,7 @@ class SceneGame extends Phaser.Scene {
             graphics.lineStyle(4, 0x00FF2D);
             graphics.fillRoundedRect(200, 440, 240, 80, 32);
             graphics.strokeRoundedRect(200, 440, 240, 80, 32);
+
             this.add.text(320, 480, 'Next Level', { fontSize: '40px', padding: 10, fill: '#00FF2D', fontFamily: 'Arial', stroke: '#000000', strokeThickness: 6 })
             .setOrigin(0.5)
             .setInteractive()
@@ -607,6 +592,7 @@ class SceneGame extends Phaser.Scene {
                 this.scene.restart('sceneStartScreen');
                 gameOver = false;
             }, this);
+
             gameOver = true;
         }
         
@@ -709,7 +695,7 @@ class SceneGame extends Phaser.Scene {
                         } else if (rand_four === 3) {
                             skeleton.setVelocity(0, -skeletonSpeed);
                         } else {
-                            skeleton.setVelocity(0, skeletonSpeed)
+                            skeleton.setVelocity(0, skeletonSpeed);
                         }
                     } else if ( (tiles[0] != 0) && (tiles[1] != 0) && (tiles[2] != 0) && (tiles[3] === 0) ) {
                         // 3 way Left is blocked
@@ -783,7 +769,7 @@ class SceneGame extends Phaser.Scene {
                         skeleton.x = tiles[4];
                     } else {
                         skeleton.disableBody(true, true);
-                        console.log("skeleton not moving // removed")
+                        console.log("skeleton not moving // removed");
                     }
 
                     skeleton.name = tiles[7];
@@ -800,12 +786,12 @@ class SceneStartScreen extends Phaser.Scene {
     }
 
     create() {
-        points = 0,
-        maxSkeletons = 4,
-        level = 1,
-        lives = 3,
-        riseTime = 4000,
-        skeletonSpeed = 60,
+        points = 0;
+        maxSkeletons = 4;
+        level = 1;
+        lives = 3;
+        riseTime = 4000;
+        skeletonSpeed = 60;
         getExtraLife = true;
         gameOverMusic = true;
         this.add.image(320, 320, 'background');
