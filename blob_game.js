@@ -126,7 +126,7 @@ function contactSkeletons(player, skeleton) {
             .setInteractive()
             .on('pointerup', function() {
                 highScores.push(points);
-                document.getElementById('highScores').innerHTML += `<div class='highScore'>Game ${gameNumber}: ${points} </div><div class='block'></div>`;
+                document.getElementById('highScores').innerHTML += `<div class='highScore'>Game ${gameNumber}: Level ${level} - ${points} Points</div><div class='block'></div>`;
                 gameNumber++;
                 this.sound.stopAll();
                 this.scene.start('sceneStartScreen');
