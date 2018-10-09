@@ -223,10 +223,10 @@ class BootGame extends Phaser.Scene {
     }
 
     preload() {
-        let loadText = this.add.text(320, 320, 'Loading... 0%', { fontSize: '24px', fill: 'gold', fontFamily: 'Arial', stroke: 'black', strokeThickness: 8 }).setOrigin(0.5),
-        assetText = this.add.text(320, 400, 'Loading Asset:', { fontSize: '24px', fill: 'gold', fontFamily: 'Arial', stroke: 'black', strokeThickness: 8 }).setOrigin(0.5),
-        progressBox = this.add.graphics(),
-        progressBar = this.add.graphics();
+        let progressBox = this.add.graphics(),
+        progressBar = this.add.graphics(),
+        loadText = this.add.text(320, 320, 'Loading... 0%', { fontSize: '24px', fill: 'gold', fontFamily: 'Arial', stroke: 'black', strokeThickness: 8 }).setOrigin(0.5),
+        assetText = this.add.text(320, 400, 'Loading Asset:', { fontSize: '24px', fill: 'gold', fontFamily: 'Arial', stroke: 'black', strokeThickness: 8 }).setOrigin(0.5);
         progressBox.fillStyle(0x444444, 0.8);
         progressBox.fillRect(20, 290, 600, 60);
         
