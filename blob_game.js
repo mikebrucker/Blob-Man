@@ -821,7 +821,7 @@ class SceneStartScreen extends Phaser.Scene {
             music.setMute(playMusic);
             musicButtonRed.setAlpha(0);
             playMusic = !playMusic;
-        }, this).setAlpha(0);
+        }, this);
         sfxButtonGreen = this.add.image(624, 12, 'sfx_on').setInteractive()
         .on('pointerup', function() {
             if (playSFX) {
@@ -839,7 +839,14 @@ class SceneStartScreen extends Phaser.Scene {
             }
             sfxButtonRed.setAlpha(0);
             playSFX = !playSFX;
-        }, this).setAlpha(0);
+        }, this);
+
+        if (playSFX) {
+            sfxButtonRed.setAlpha(0);
+        }
+        if (playMusic) {
+            musicButtonRed.setAlpha(0);
+        }
 
         this.add.sprite(176, 336, 'blob_child_color').play('idle_color').setScale(0.75);
         this.add.sprite(464, 336, 'blob_child_color').play('idle_color').setScale(0.75);
