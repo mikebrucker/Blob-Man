@@ -32,6 +32,7 @@ let music_config = {
 highScores = [],
 gameNumber = 1,
 victoryMusic,
+gameOverMusic,
 getExtraLife,
 gameOver,
 invincible,
@@ -107,8 +108,10 @@ function contactSkeletons(player, skeleton) {
                     blob.anims.play('collect');
                 }
             }
-
-            this.sound.play('death')
+            if (gameOverMusic) {
+                this.sound.play('death')
+                gameOverMusic = false;
+            }
             
             let graphics = this.add.graphics();
             graphics.fillStyle(0x222222);
@@ -721,6 +724,7 @@ class SceneStartScreen extends Phaser.Scene {
         riseTime = 4000,
         skeletonSpeed = 60,
         getExtraLife = true;
+        gameOverMusic = true;
         this.add.image(320, 320, 'background');
         this.add.sprite(176, 336, 'blob_child_color').play('idle_color').setScale(0.75);
         this.add.sprite(464, 336, 'blob_child_color').play('idle_color').setScale(0.75);
