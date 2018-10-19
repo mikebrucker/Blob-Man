@@ -29,8 +29,11 @@ let music_config = {
     loop: true,
     delay: 0
 },
+pauseOff = true,
 playMusic = true,
 playSFX = true,
+pauseButtonGreen,
+pauseButtonRed,
 musicButtonGreen,
 musicButtonRed,
 sfxButtonGreen,
@@ -256,6 +259,8 @@ class BootGame extends Phaser.Scene {
         this.load.image('life', 'public/images/life.png');
         this.load.image('music_on', 'public/images/music_on.png');
         this.load.image('music_off', 'public/images/music_off.png');
+        this.load.image('pause_on', 'public/images/pause_on.png');
+        this.load.image('pause_off', 'public/images/pause_off.png');
         this.load.image('sfx_on', 'public/images/sfx_on.png');
         this.load.image('sfx_off', 'public/images/sfx_off.png');
         this.load.tilemapTiledJSON('map', 'public/images/blobmap.json');
@@ -363,28 +368,24 @@ class BootGame extends Phaser.Scene {
     }
 }
 
-class SceneGame extends Phaser.Scene {
-
+class HUD extends Phaser.Scene {
     constructor() {
-        super('sceneGame');
+        super('HUD');
     }
-    
+
     create() {
-        gameOver = false;
-        invincible = false;
-        victoryMusic = true;
-
-        music.play();
-
-        const map = this.make.tilemap({ key: 'map' });
-        const tileset = map.addTilesetImage('tileset', 'tiles');
-        const worldLayer = map.createStaticLayer('World', tileset, 0, 0);
-        
-        worldLayer.setCollisionBetween(1, 213, true, 'World');
-        worldLayer.setCollisionBetween(215, 270, true, 'World');
-        worldLayer.setCollisionBetween(272, 407, true, 'World');
-        worldLayer.setCollisionBetween(409, 512, true, 'World');
-
+        pauseButtonGreen = this.add.image(560, 12, 'pause_off').setInteractive()
+        .on('pointerup', function() {
+            this.scene.pause('sceneGame');
+            pauseButtonRed.setAlpha(1);
+            pauseOff = false;
+        }, this);
+        pauseButtonRed = this.add.image(560, 12, 'pause_on').setInteractive()
+        .on('pointerup', function() {
+            this.scene.resume('sceneGame');
+            pauseButtonRed.setAlpha(0);
+            pauseOff = true;
+        }, this).setAlpha(0);
         musicButtonGreen = this.add.image(592, 12, 'music_on').setInteractive()
         .on('pointerup', function() {
             music.setMute(playMusic);
@@ -415,13 +416,38 @@ class SceneGame extends Phaser.Scene {
             sfxButtonRed.setAlpha(0);
             playSFX = !playSFX;
         }, this);
-
+        
         if (playSFX) {
             sfxButtonRed.setAlpha(0);
         }
         if (playMusic) {
             musicButtonRed.setAlpha(0);
         }
+    }
+}
+
+class SceneGame extends Phaser.Scene {
+
+    constructor() {
+        super('sceneGame');
+    }
+    
+    create() {
+        this.scene.launch('HUD');
+        gameOver = false;
+        invincible = false;
+        victoryMusic = true;
+
+        music.play();
+
+        const map = this.make.tilemap({ key: 'map' });
+        const tileset = map.addTilesetImage('tileset', 'tiles');
+        const worldLayer = map.createStaticLayer('World', tileset, 0, 0);
+        
+        worldLayer.setCollisionBetween(1, 213, true, 'World');
+        worldLayer.setCollisionBetween(215, 270, true, 'World');
+        worldLayer.setCollisionBetween(272, 407, true, 'World');
+        worldLayer.setCollisionBetween(409, 512, true, 'World');
 
         lifeIcons = this.add.group();
         
@@ -456,22 +482,24 @@ class SceneGame extends Phaser.Scene {
         let rise_sound = this.sound.add('rise', { volume: 3 });
         createSkeletons = setInterval(function() {
             if (skeletons.countActive(true) < maxSkeletons) {
-                let rise = rises.create(320, 352, 'skeleton_rise');
-                if (invincible) {
-                    rise.setTint(0x00DDFF);
+                if (pauseOff) {
+                    let rise = rises.create(320, 352, 'skeleton_rise');
+                    if (invincible) {
+                        rise.setTint(0x00DDFF);
+                    }
+                    rise.displayHeight = 32;
+                    rise.displayWidth = 21.333333;
+                    rise.anims.play('skeleton_rise');
+                    if (playSFX) {
+                        rise_sound.play();
+                    }
+                    rise.on('animationcomplete', function() {
+                        rise.disableBody(true, true);
+                        let skeleton = skeletons.create(320, 352, 'skeleton');
+                        skeleton.displayHeight = 32;
+                        skeleton.displayWidth = 21.333333;
+                    });
                 }
-                rise.displayHeight = 32;
-                rise.displayWidth = 21.333333;
-                rise.anims.play('skeleton_rise');
-                if (playSFX) {
-                    rise_sound.play();
-                }
-                rise.on('animationcomplete', function() {
-                    rise.disableBody(true, true);
-                    let skeleton = skeletons.create(320, 352, 'skeleton');
-                    skeleton.displayHeight = 32;
-                    skeleton.displayWidth = 21.333333;
-                });
             }
         }, riseTime);
         
@@ -489,7 +517,9 @@ class SceneGame extends Phaser.Scene {
             }
         });
 
-        player = this.physics.add.sprite(320, 496, 'blob').setSize(32, 32);
+        player = this.physics.add.sprite(320, 496, 'blob');
+        // player.setCircle(10);
+        player.body.setCircle(16, 1, 1);
 
         this.physics.add.collider(player, worldLayer);
         this.physics.add.collider(skeletons, worldLayer);
@@ -524,16 +554,18 @@ class SceneGame extends Phaser.Scene {
         let timer_sec = 1,
         timer_min = 0;
         gameTimer = setInterval(function gameTimer() {
-            if (timer_sec < 10) {
-                timer.setText(`${timer_min}:0${timer_sec}`);
-            } else {
-                timer.setText(`${timer_min}:${timer_sec}`);
-            }
-            finalTime = (timer_min * 60) + timer_sec;
-            timer_sec++;
-            if (timer_sec === 60) {
-                timer_sec = 0;
-                timer_min++;
+            if (pauseOff) {
+                if (timer_sec < 10) {
+                    timer.setText(`${timer_min}:0${timer_sec}`);
+                } else {
+                    timer.setText(`${timer_min}:${timer_sec}`);
+                }
+                finalTime = (timer_min * 60) + timer_sec;
+                timer_sec++;
+                if (timer_sec === 60) {
+                    timer_sec = 0;
+                    timer_min++;
+                }
             }
         }, 1000);
     }
@@ -675,7 +707,7 @@ class SceneGame extends Phaser.Scene {
                 skeletonTileY = Math.abs(tiles[5] - skeleton.y);
 
                 // Skeleton chooses to go left or right after rising from the crypt
-                if ( (tiles[6] === 8) && (skeleton.name === '') && (skeletonTileY < 1) ) {
+                if ( (tiles[6] === 8) && (skeleton.name === '') && (skeletonTileY < 2) ) {
                     if (rand_two === 1) {
                         skeleton.setVelocity(-skeletonSpeed, 0);
                     } else {
@@ -685,7 +717,7 @@ class SceneGame extends Phaser.Scene {
                 }
 
                 // Skeleton chooses a random direction at each intersection
-                if ( (skeleton.name != tiles[7]) && (skeletonTileX < 3) && (skeletonTileY < 3) ) {
+                if ( (skeleton.name != tiles[7]) && (skeletonTileX < 4) && (skeletonTileY < 4) ) {
                     if ( (tiles[0] != 0) && (tiles[1] != 0) && (tiles[2] != 0) && (tiles[3] != 0) ) {
                         // 4 way intersection
                         if (rand_four === 1) {
@@ -796,6 +828,8 @@ class SceneStartScreen extends Phaser.Scene {
         gameOverMusic = true;
         this.add.image(320, 320, 'background');
 
+        pauseButtonGreen = this.add.image(560, 12, 'pause_off');
+
         musicButtonGreen = this.add.image(592, 12, 'music_on').setInteractive()
         .on('pointerup', function() {
             music.setMute(playMusic);
@@ -868,6 +902,6 @@ let config = {
             gravity: { y: 0 }
         }
     },
-    scene: [ BootGame, SceneStartScreen, SceneGame ]
+    scene: [ BootGame, SceneStartScreen, SceneGame, HUD ]
 },
 game = new Phaser.Game(config);
