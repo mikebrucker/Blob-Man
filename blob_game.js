@@ -895,6 +895,7 @@ let config = {
     parent: 'content',
     width: 640,
     height: 640,
+    backgroundColor: '#222222',
     parent: 'gameContainer',
     physics: {
         default: 'arcade',
