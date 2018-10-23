@@ -11,31 +11,33 @@ body {
     background: #222222;
     border: 4px solid #00FF2D;
     border-radius: 32px;
+    padding: 10px;
 }
 
 #custom, #customShow, .highScore, #customContainer {
     display: inline-block;
     box-sizing: border-box;
-    padding: 10px;
 }
 
 input {
     min-width: 44px;
+    margin-right: 46px;
     background: #00FF2D;
     border: none;
     font-weight: bolder;
 }
 
-.highScore {
+.highScore, #custom, #customShow {
     min-width: 412px;
 }
 
 #custom {
+    margin: 8px auto;
     text-align: right;
 }
 
-#custom, #customShow {
-    min-width: 356px;
+#customShow {
+    font-size: 24px;
 }
 
 .block {
