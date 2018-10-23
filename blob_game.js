@@ -64,11 +64,32 @@ level = 1,
 lives = 3,
 riseTime = 4000,
 skeletonSpeed = 60,
-finalTime = 0;
+finalTime = 0,
+custom,
+customMax,
+customRise,
+customSpeed,
+customShow;
+
+document.addEventListener('DOMContentLoaded', () => {
+    custom = document.getElementById('custom'),
+    customMax = document.getElementById('maxSkeletons'),
+    customRise = document.getElementById('riseTime'),
+    customShow = document.getElementById('customShow'),
+    customSpeed = document.getElementById('skeletonSpeed');
+    custom.style.display = 'none';
+    customShow.addEventListener('click', () => {
+        if (custom.style.display === 'inline-block') {
+            custom.style.display = 'none';
+        } else {
+            custom.style.display = 'inline-block';
+        }
+    });
+});
 
 function componentToHex(c) {
     let hex = c.toString(16);
-    return hex.length == 1 ? "0" + hex : hex;
+    return hex.length == 1 ? '0' + hex : hex;
 }
 
 function rgbToHex(r, g, b) {
@@ -369,6 +390,7 @@ class BootGame extends Phaser.Scene {
 }
 
 class HUD extends Phaser.Scene {
+
     constructor() {
         super('HUD');
     }
@@ -481,7 +503,7 @@ class SceneGame extends Phaser.Scene {
         }
         let rise_sound = this.sound.add('rise', { volume: 3 });
         createSkeletons = setInterval(function() {
-            if (skeletons.countActive(true) < maxSkeletons) {
+            if (skeletons.countActive(true) + rises.countActive(true) < maxSkeletons) {
                 if (pauseOff) {
                     let rise = rises.create(320, 352, 'skeleton_rise');
                     if (invincible) {
@@ -568,6 +590,15 @@ class SceneGame extends Phaser.Scene {
                 }
             }
         }, 1000);
+
+        game.events.on('blur', function() {
+            this.scene.pause();
+            pauseOff = false;
+        }, this);
+        game.events.on('focus', function() {
+            this.scene.resume();
+            pauseOff = true;
+        }, this);
     }
 
     update() {
@@ -874,18 +905,47 @@ class SceneStartScreen extends Phaser.Scene {
         let graphics = this.add.graphics();
         graphics.fillStyle(0x222222);
         graphics.lineStyle(4, 0x00FF2D);
-        graphics.fillRoundedRect(240, 440, 160, 80, 32);
-        graphics.strokeRoundedRect(240, 440, 160, 80, 32);
+        graphics.fillRoundedRect(240, 360, 160, 80, 32);
+        graphics.strokeRoundedRect(240, 360, 160, 80, 32);
+        graphics.fillRoundedRect(240, 460, 160, 80, 32);
+        graphics.strokeRoundedRect(240, 460, 160, 80, 32);
         graphics.fillRoundedRect(10, 88, 620, 136, 32);
         graphics.strokeRoundedRect(10, 88, 620, 136, 32);
 
         this.add.text(320, 160, 'Blob Man', { fontSize: '140px', padding: 10, fill: '#00FF2D', fontFamily: 'Arial', stroke: '#000000', strokeThickness: 10 }).setOrigin(0.5);
-        this.add.text(320, 480, 'Start', { fontSize: '40px', padding: 10, fill: '#00FF2D', fontFamily: 'Arial', stroke: '#000000', strokeThickness: 6 })
+        this.add.text(320, 500, 'Start', { fontSize: '40px', padding: 10, fill: '#00FF2D', fontFamily: 'Arial', stroke: '#000000', strokeThickness: 6 })
         .setOrigin(0.5)
         .setInteractive()
         .on('pointerup', function() {
             this.sound.stopAll();
             this.scene.start('sceneGame');
+        }, this);
+
+        this.add.text(320, 400, 'Custom', { fontSize: '40px', padding: 10, fill: '#00FF2D', fontFamily: 'Arial', stroke: '#000000', strokeThickness: 6 })
+        .setOrigin(0.5)
+        .setInteractive()
+        .on('pointerup', function() {
+            this.sound.stopAll();
+            riseTime = parseFloat(customRise.value) * 1000;
+            skeletonSpeed = parseInt(customSpeed.value);
+            maxSkeletons = parseInt(customMax.value);
+            if (riseTime < 500 || riseTime > 4000 || skeletonSpeed < 60 || skeletonSpeed > 120 || maxSkeletons < 4 || maxSkeletons > 60) {
+                let fixText = this.add.text(320, 320, 'Fix Custom Attributes', { fontSize: '30px', padding: 10, fill: '#00FF2D', fontFamily: 'Arial', stroke: '#000000', strokeThickness: 6 }).setOrigin(0.5);
+                this.add.tween({
+                    targets: fixText,
+                    ease: 'Sine.easeInOut',
+                    duration: 3000,
+                    alpha: {
+                        getStart: () => 1,
+                        getEnd: () => 0
+                    }
+                });
+                riseTime = 4000;
+                skeletonSpeed = 60;
+                maxSkeletons = 4;
+            } else {
+                this.scene.start('sceneGame');
+            }
         }, this);
     }
 }

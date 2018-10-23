@@ -13,6 +13,20 @@
 </head>
 <body>
     <div id="gameContainer"></div>
+    <div id="customContainer">
+        <div id="customShow">Click For Custom Level</div>
+        <div class="block"></div>
+        <div id="custom">
+            <label for="maxSkeletons">Max Skeletons(4-60)</label>
+            <input type="number" id="maxSkeletons" value="4" min="4" max="60">
+            <div class="block"></div>
+            <label for="skeletonSpeed">Skeleton Speed(60-120)</label>
+            <input type="number" id="skeletonSpeed" value="60" min="60" max="120">
+            <div class="block"></div>
+            <label for="riseTime">Spawn Speed(0.5-4)</label>
+            <input type="number" id="riseTime" value="4" min="0.5" max="4" step="0.1">
+        </div>
+    </div>
     <div id="highScores"></div>
 </body>
 </html>

@@ -7,14 +7,35 @@ body {
     color: #00FF2D;
 }
 
-.highScore {
-    display: inline-block;
-    box-sizing: border-box;
-    padding: 10px;
+.highScore, #customContainer {
     background: #222222;
     border: 4px solid #00FF2D;
     border-radius: 32px;
+}
+
+#custom, #customShow, .highScore, #customContainer {
+    display: inline-block;
+    box-sizing: border-box;
+    padding: 10px;
+}
+
+input {
+    min-width: 44px;
+    background: #00FF2D;
+    border: none;
+    font-weight: bolder;
+}
+
+.highScore {
     min-width: 412px;
+}
+
+#custom {
+    text-align: right;
+}
+
+#custom, #customShow {
+    min-width: 356px;
 }
 
 .block {
