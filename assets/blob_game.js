@@ -41,7 +41,7 @@ sfxButtonRed,
 victoryMusic,
 gameOverMusic,
 getExtraLife,
-gameOver,
+gameOver = true,
 invincible,
 player,
 blobs,
@@ -400,17 +400,21 @@ class HUD extends Phaser.Scene {
         pauseText = this.add.text(320, 320, '', {fontSize: '88px', fill: '#00FF2D', fontFamily: 'Arial', stroke: '#000000', strokeThickness: 8}).setOrigin(0.5),
         pauseButtonGreen = this.add.image(560, 12, 'pause_off').setInteractive()
         .on('pointerup', function() {
-            this.scene.pause('sceneGame');
-            pauseButtonRed.setAlpha(1);
-            pauseOff = false;
-            pauseText.setText('Game Paused');
+            if (!gameOver) {
+                this.scene.pause('sceneGame');
+                pauseButtonRed.setAlpha(1);
+                pauseOff = false;
+                pauseText.setText('Game Paused');
+            }
         }, this);
         pauseButtonRed = this.add.image(560, 12, 'pause_on').setInteractive()
         .on('pointerup', function() {
-            this.scene.resume('sceneGame');
-            pauseButtonRed.setAlpha(0);
-            pauseOff = true;
-            pauseText.setText('');
+            if (!gameOver) {
+                this.scene.resume('sceneGame');
+                pauseButtonRed.setAlpha(0);
+                pauseOff = true;
+                pauseText.setText('');
+            }
         }, this).setAlpha(0);
         musicButtonGreen = this.add.image(592, 12, 'music_on').setInteractive()
         .on('pointerup', function() {
@@ -596,10 +600,14 @@ class SceneGame extends Phaser.Scene {
         }, 1000);
 
         game.events.on('blur', function() {
-            this.scene.pause();
-            pauseOff = false;
-            pauseButtonRed.setAlpha(1);
-            pauseText.setText('Game Paused');
+            if (!gameOver) {
+                if (this.scene.isActive('sceneGame')) {
+                    this.scene.pause();
+                    pauseOff = false;
+                    pauseButtonRed.setAlpha(1);
+                    pauseText.setText('Game Paused');
+                }
+            }
         }, this);
     }
 
